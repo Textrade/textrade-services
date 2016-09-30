@@ -22,3 +22,11 @@ URL = LOCAL_URL  # TODO: In production change to PUBLIC_URL
 API_VERSION = 1
 API_PREFIX_URI = "api/v{}/".format(API_VERSION)
 API_URL = URL + API_PREFIX_URI
+
+
+def reset_system(db, reset=False):
+    if reset:
+        db.drop_all()
+        db.create_all()
+    else:
+        db.create_all()
