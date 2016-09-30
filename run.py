@@ -1,12 +1,6 @@
-from flask import Flask
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+import config
+from app import app
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host=config.HOST, port=config.PORT, debug=config.DEBUG)
