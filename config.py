@@ -10,7 +10,7 @@ PORT = 5000
 DEBUG = True
 
 # Local DB Information
-SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/dev-db.db"
+SQLALCHEMY_DATABASE_URI = "sqlite:///../dev-db.sqlite"
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 # Site Information

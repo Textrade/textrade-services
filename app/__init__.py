@@ -18,3 +18,6 @@ def index():
 @app.route('/api/v1/docs/')
 def docs():
     return "<h3>Needs to be written</h3>"
+
+from .models.api import Elmer
+
