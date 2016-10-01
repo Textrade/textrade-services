@@ -11,7 +11,7 @@ from app.core.tools import check_hash, hash_password
 class ApiUser(BaseModel, db.Model):
     __tablename__ = "api_user"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255))
     joined = db.Column(db.DateTime, default=datetime.datetime.now())
