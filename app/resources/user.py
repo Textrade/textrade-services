@@ -1,7 +1,10 @@
-from flask import Blueprint, jsonify
+import json
+
+from flask import Blueprint, jsonify, Response
 from flask_restful import Resource, Api, reqparse
 
 from app.auth.auth import auth
+from app.core.tools import JSON_RESP
 
 
 class UserAuthRes(Resource):
@@ -22,8 +25,12 @@ class UserAuthRes(Resource):
 
     @auth.login_required
     def post(self):
+        resp = None
         args = self.parser.parse_args()
-        return args
+
+
+
+        return ""
 
 
 user_api = Blueprint('app.res.user', __name__)

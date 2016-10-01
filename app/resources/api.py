@@ -11,7 +11,7 @@ class ApiUserRes(Resource):
     @auth.login_required
     def get(self):
         token = g.user.generate_auth_token()
-        return jsonify({
+        json_resp = jsonify({
             'status': 200,
             'msg': "",
             'content': {
