@@ -36,9 +36,9 @@ class ApiUser(BaseModel, db.Model):
             return user
 
     def verify_password(self, password):
-        return check_hash(password, self.password)
+        return check_hash(self.password, password)
 
-    def generate_auth_token(self, expires=36000):
+    def generate_auth_token(self, expires=3.15576E+07):
         serializer = Serializer(config.SECRET_KEY, expires_in=expires)
         return serializer.dumps({'id': self.id})
 

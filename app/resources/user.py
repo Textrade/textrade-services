@@ -1,10 +1,11 @@
 import json
 
-from flask import Blueprint, jsonify, Response
+from flask import Blueprint, Response
 from flask_restful import Resource, Api, reqparse
 
 from app.auth.auth import auth
-from app.core.tools import JSON_RESP
+from app.core.user import UserController
+from app.core.tools import JSON_RESP_TYPE, JSON_RESP_TEMPLATE
 
 
 class UserAuthRes(Resource):
@@ -25,12 +26,11 @@ class UserAuthRes(Resource):
 
     @auth.login_required
     def post(self):
-        resp = None
         args = self.parser.parse_args()
-
-
-
-        return ""
+        json_resp = JSON_RESP_TEMPLATE
+        json_resp['status'] = 200
+        json_resp['content'] = UserController.verify_user(args['username'], args['password'])
+        return Response(json.dumps(json_resp, indent=4), status=200, mimetype=JSON_RESP_TYPE)
 
 
 user_api = Blueprint('app.res.user', __name__)

@@ -2,11 +2,10 @@ import datetime
 
 import sqlalchemy as sql
 from itsdangerous import URLSafeTimedSerializer
-from flask.ext.bcrypt import check_password_hash, generate_password_hash
+from app.core.tools import hash_password, check_hash
 
 import config
 from app.models.user import User, db
-
 
 
 class UserController:
@@ -65,6 +64,15 @@ class UserController:
             )
         )
         db.session.commit()
+
+    @staticmethod
+    def verify_user(username, password):
+        try:
+            user = UserController.get_user_by_username(username)
+        except UserController.UserNotFound:
+            return False
+        else:
+            return UserController.check_hash(user.password, password)
 
     def change_password(self, old_password, new_password):
         """Change the user passed in constructor."""
@@ -159,11 +167,11 @@ class UserController:
 
     @staticmethod
     def __get_hash(password):
-        return generate_password_hash(password)
+        return hash_password(password)
 
     @staticmethod
     def check_hash(p_hash, password):
-        return check_password_hash(p_hash, password)
+        return check_hash(p_hash, password)
 
     def __generate_token(self):
         return URLSafeTimedSerializer(
