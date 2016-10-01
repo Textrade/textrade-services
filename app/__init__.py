@@ -25,6 +25,7 @@ from app.resources.user import user_api
 
 # API Models Import
 from app.models.api import ApiUser
+from app.models.user import User, UserRole
 
 # API App Registration
 app.register_blueprint(api_user_api, url_prefix=config.API_PREFIX_URI)

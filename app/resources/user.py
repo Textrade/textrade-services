@@ -19,11 +19,11 @@ class UserAuthRes(Resource):
             required=True,
             help="Password wasn't provided"
         )
-        super().__init__()
 
     @auth.login_required
     def post(self):
-        return "Testing!"
+        args = self.parser.parse_args()
+        return args
 
 
 user_api = Blueprint('app.res.user', __name__)
