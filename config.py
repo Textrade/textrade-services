@@ -17,13 +17,13 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///../dev-db.sqlite"
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 # Site Information
-LOCAL_URL = "http://{HOST}:{PORT}/".format(HOST=HOST, PORT=PORT)
-PUBLIC_URL = "http://{}/".format(DOMAIN_NAME)
+LOCAL_URL = "http://{HOST}:{PORT}".format(HOST=HOST, PORT=PORT)
+PUBLIC_URL = "http://{}".format(DOMAIN_NAME)
 URL = LOCAL_URL  # TODO: In production change to PUBLIC_URL
 
 # API Information
 API_VERSION = 1
-API_PREFIX_URI = "api/v{}/".format(API_VERSION)
+API_PREFIX_URI = "/api/v{}".format(API_VERSION)
 API_URL = URL + API_PREFIX_URI
 
 

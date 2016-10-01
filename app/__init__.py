@@ -19,5 +19,11 @@ def index():
 def docs():
     return "<h3>Needs to be written</h3>"
 
-from .models.api import Elmer
+# API Resources Import
+from app.resources.api import api_user_api
 
+# API Models Import
+from app.models.api import ApiUser
+
+# API App Registration
+app.register_blueprint(api_user_api, url_prefix=config.API_PREFIX_URI)

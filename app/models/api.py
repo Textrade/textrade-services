@@ -5,7 +5,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
 
 import config
 from .base import BaseModel, db
-from app.core.tools import check_hash
+from app.core.tools import check_hash, hash_password
 
 
 class ApiUser(BaseModel, db.Model):
@@ -18,7 +18,7 @@ class ApiUser(BaseModel, db.Model):
 
     def __init__(self, username, password, description):
         self.username = username
-        self.password = password
+        self.password = hash_password(password)
         self.description = description
 
     def __repr__(self):
@@ -41,6 +41,10 @@ class ApiUser(BaseModel, db.Model):
     def generate_auth_token(self, expires=36000):
         serializer = Serializer(config.SECRET_KEY, expires_in=expires)
         return serializer.dumps({'id': self.id})
+
+    @staticmethod
+    def get_user(username):
+        return ApiUser.query.filter_by(username=username).first()
 
     @staticmethod
     def build_from_args(**kwargs):
