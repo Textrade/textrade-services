@@ -5,6 +5,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
 
 import config
 from .base import BaseModel, db
+from app.core.tools import check_hash
 
 
 class ApiUser(BaseModel, db.Model):
@@ -35,7 +36,7 @@ class ApiUser(BaseModel, db.Model):
             return user
 
     def verify_password(self, password):
-        return ModelHelper.check_hash(password, self.password)
+        return check_hash(password, self.password)
 
     def generate_auth_token(self, expires=36000):
         serializer = Serializer(config.SECRET_KEY, expires_in=expires)
