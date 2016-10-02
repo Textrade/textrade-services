@@ -11,7 +11,7 @@ class ApiUserRes(Resource):
     def __init__(self):
         super().__init__()
 
-    @client_auth.login_required
+    # @client_auth.login_required
     def get(self):
         token = g.client.generate_auth_token()
         json_resp = JSON_RESP_TEMPLATE

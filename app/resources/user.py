@@ -24,7 +24,7 @@ class UserAuthRes(Resource):
             help="Password wasn't provided"
         )
 
-    @client_auth.login_required
+    # @client_auth.login_required
     def post(self):
         args = self.parser.parse_args()
         json_resp = JSON_RESP_TEMPLATE
