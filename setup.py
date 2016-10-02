@@ -3,6 +3,7 @@ The purpose of this program is to setup the local environment,
 with default API User, User, UserRole, more will be added in the future.
 """
 import sys
+import os
 
 from sqlalchemy.exc import IntegrityError
 
@@ -42,6 +43,10 @@ def create_users(users=None):
 
     fake = faker.Factory.create()
     users = []
+    fp = open("users.txt", "w")
+    fp.write("Development User Information\n\n")
+    fp.write("Password for all users is: '{}'\n\n".format(DEFAULT_USER_PASSWORD))
+    fp.write("Username\n=========\n")
 
     print("Creating Users")
     for i in range(0, 10):
@@ -59,7 +64,9 @@ def create_users(users=None):
         except IntegrityError:
             print("{} is duplicate... Continuing".format(users[i]))
         else:
+            fp.write("{}\n".format(users[i]['username']))
             print("{} created".format(users[i]))
+    fp.close()
     print("Users done")
 
 
