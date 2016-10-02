@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, Response
 from flask_restful import Resource, Api, reqparse
 
-from app.auth.auth import auth
+from app.auth.auth import client_auth
 from app.core.user import UserController
 from app.core.tools import JSON_RESP_TYPE, JSON_RESP_TEMPLATE
 
@@ -24,7 +24,7 @@ class UserAuthRes(Resource):
             help="Password wasn't provided"
         )
 
-    @auth.login_required
+    @client_auth.login_required
     def post(self):
         args = self.parser.parse_args()
         json_resp = JSON_RESP_TEMPLATE

@@ -2,9 +2,9 @@ import datetime
 
 import sqlalchemy as sql
 from itsdangerous import URLSafeTimedSerializer
-from app.core.tools import hash_password, check_hash
 
 import config
+from app.core.tools import hash_password, check_hash
 from app.models.user import User, db
 
 

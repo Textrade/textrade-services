@@ -1,9 +1,9 @@
 import json
 
-from flask import Blueprint, g, Response
+from flask import Blueprint, g, Response, request
 from flask_restful import Resource, Api
 
-from app.auth.auth import auth
+from app.auth.auth import client_auth
 from app.core.tools import JSON_RESP_TYPE, JSON_RESP_TEMPLATE
 
 
@@ -11,9 +11,9 @@ class ApiUserRes(Resource):
     def __init__(self):
         super().__init__()
 
-    @auth.login_required
+    @client_auth.login_required
     def get(self):
-        token = g.user.generate_auth_token()
+        token = g.client.generate_auth_token()
         json_resp = JSON_RESP_TEMPLATE
         json_resp['status'] = 200
         json_resp['content'] = {'token': token.decode('ascii')}
