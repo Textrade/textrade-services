@@ -8,9 +8,11 @@ import os
 from sqlalchemy.exc import IntegrityError
 
 from app import db
+import config
 from app.models.api import ApiUser
 from app.models.user import User, UserRole
 
+FILE_NAME = "users.txt"
 USER_ROLES = [
     UserRole("customer"),
     UserRole("administrator"),
@@ -43,7 +45,7 @@ def create_users(users=None):
 
     fake = faker.Factory.create()
     users = []
-    fp = open("users.txt", "w")
+    fp = open(FILE_NAME, "w")
     fp.write("Development User Information\n\n")
     fp.write("Password for all users is: '{}'\n\n".format(DEFAULT_USER_PASSWORD))
     fp.write("Username\n=========\n")
@@ -89,8 +91,13 @@ def development():
     create_users()
 
 
+def reset():
+    os.remove('./%s' % config.DB_NAME)
+    os.remove('./%s' % FILE_NAME)
+
+
 def usage():
-    print("\nusage: python setup.py [-d development] [-p production]\n")
+    print("\nusage: python setup.py [-d development] [-p production] [-rd reset and build development]\n")
 
 
 def run(args):
@@ -100,6 +107,10 @@ def run(args):
         if args[1] == '-d':
             development()
             print("Development setup created successfully")
+        elif args[1] == '-rd':
+            reset()
+            db.create_all()  # Create database and tables if doesn't exits
+            development()
         elif args[1] == '-p':
             print("Production setup hasn't been implemented")
         else:

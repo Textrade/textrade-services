@@ -33,6 +33,20 @@ class User(BaseModel, db.Model):
     def get_by_username(username):
         return User.query.filter_by(username=username).first()
 
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'username': self.username,
+            'password': self.password,
+            'joined': self.joined,
+            'email': self.university_email,
+            'active': self.active,
+            'activated_on': self.activated_on,
+            'role': self.role
+        }
+
     def get_name(self):
         return "%s %s" % (self.first_name, self.last_name)
 

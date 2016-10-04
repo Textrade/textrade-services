@@ -26,32 +26,24 @@ class UserController:
     @staticmethod
     def create_user(**kwargs):
         """"Create user controls."""
-        db.session.add(
-            User(
-                first_name=kwargs['first_name'],
-                last_name=kwargs['last_name'],
-                username=kwargs['username'],
-                password=kwargs['password'],
-                # TODO: when expansion to different schools
-                university_email=kwargs['university_email'],
-                role="costumer"
-            )
+        user = User(
+            first_name=kwargs['first_name'],
+            last_name=kwargs['last_name'],
+            username=kwargs['username'],
+            password=hash_password(kwargs['password']),
+            university_email=kwargs['email'],
+            role="costumer"
         )
+        db.session.add(user)
         db.session.commit()
+        return user
 
     def create(self):
         """Create user if initialized with constructor."""
-        db.session.add(
-            User(self.first_name, self.last_name, self.username,
-                 self.password, self.university_email, self.role)
-        )
+        user = User(self.first_name, self.last_name, self.username, self.password, self.university_email, self.role)
+        db.session.add(user)
         db.session.commit()
-        return {
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'username': self.username,
-            'university_email': self.university_email
-        }
+        return user.get_dict()
 
     @staticmethod
     def activate(username):
@@ -158,12 +150,7 @@ class UserController:
             user = UserController.get_user_by_username(username)
         else:
             raise UserController.UserNotFound("No argument passed.")
-        return {
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'username': user.username,
-            'university_email': user.university_email
-        }
+        return user.get_dict()
 
     @staticmethod
     def __get_hash(password):

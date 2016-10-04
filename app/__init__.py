@@ -16,6 +16,7 @@ cross = CORS(app, resources={r"/api/*": {"origins": "*"}})
 def index():
     return redirect("https://github.com/dsantosp12/textrade-services/wiki")
 
+
 # API Resources Import
 from app.resources.api import api_user_api
 from app.resources.user import user_api

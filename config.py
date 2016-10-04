@@ -13,7 +13,8 @@ DEBUG = True
 SECRET_KEY = ';\xec:G\x91\xdf\xdf\x89\x81\x81\x13\xf0hv\xc5\x06\xa5\x9b\x84\x85\x98\xb3DC'
 
 # Local DB Information
-SQLALCHEMY_DATABASE_URI = "sqlite:///../dev-db.sqlite"
+DB_NAME = "dev-db.sqlite"
+SQLALCHEMY_DATABASE_URI = "sqlite:///../{}".format(DB_NAME)
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 # Site Information
