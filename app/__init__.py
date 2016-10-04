@@ -1,5 +1,6 @@
-from flask import Flask, url_for
+from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 import config
 
@@ -8,16 +9,12 @@ app = Flask(__name__)
 app.config.from_object(config)
 
 db = SQLAlchemy(app)
+cross = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
 @app.route('/')
 def index():
-    return "<h3>For help, refer to the <a href='{}'>documentation</a>.".format(url_for('docs'))
-
-
-@app.route('/api/v1/docs/')
-def docs():
-    return "<h3>Needs to be written</h3>"
+    return redirect("https://github.com/dsantosp12/textrade-services/wiki")
 
 # API Resources Import
 from app.resources.api import api_user_api
