@@ -23,8 +23,9 @@ from app.resources.user import user_api
 from app.resources.search import search_api
 
 # API Models Import
-from app.models.api import ApiUser
-from app.models.user import User, UserRole
+from app.models.api import *
+from app.models.user import *
+from app.models.book import *
 
 # API App Registration
 app.register_blueprint(api_user_api, url_prefix=config.API_PREFIX_URI)
