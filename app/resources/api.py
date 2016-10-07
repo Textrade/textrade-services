@@ -1,5 +1,3 @@
-import json
-
 from flask import Blueprint, g, Response, request
 from flask_restful import Resource, Api
 
@@ -11,7 +9,7 @@ class ApiUserRes(Resource):
     def __init__(self):
         super().__init__()
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def get(self):
         token = g.client.generate_auth_token()
         json_resp = JT.JSON_RESP_TEMPLATE

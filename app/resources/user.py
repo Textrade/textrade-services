@@ -1,5 +1,3 @@
-import json
-
 from flask import Blueprint, Response
 from flask_restful import Resource, Api, reqparse, fields, marshal
 
@@ -24,7 +22,7 @@ class UserAuthRes(Resource):
             help="Password wasn't provided"
         )
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def post(self):
         args = self.parser.parse_args()
         json_resp = JT.JSON_RESP_TEMPLATE
@@ -81,11 +79,11 @@ class UserRes(Resource):
         )
         super().__init__()
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def post(self):
         return "post"
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def get(self, user_id):
         try:
             user = UserController.get_user_by_id(user_id)
@@ -102,11 +100,11 @@ class UserRes(Resource):
             return Response(dumper(json_resp),
                             status=200, mimetype=JT.JSON_RESP_TYPE)
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def put(self):
         return "put"
 
-    # @client_auth.login_required
+    @client_auth.login_required
     def delete(self):
         return "delete"
 
