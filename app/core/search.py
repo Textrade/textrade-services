@@ -1,13 +1,15 @@
 from app import db
 from app.models.user import User
+from app.models.book import BookToRent
 
 
 class SearchEngine:
     def __init__(self):
         pass
 
-    def book_by_isbn(self, isbn):
-        raise NotImplementedError
+    @staticmethod
+    def book_by_isbn(isbn):
+        return BookToRent.query.filter(BookToRent.isbn.contains('%{}%'.format(isbn)))
 
     def book_by_title(self, title):
         raise NotImplementedError

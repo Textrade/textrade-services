@@ -78,6 +78,20 @@ class BookToRent(BaseModel, db.Model):
     def __repr__(self):
         return "<Book To Rent: {}>".format(self.name)
 
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'author': self.author,
+            'description': self.description,
+            'isbn': self.isbn,
+            'condition': self.condition.condition,
+            'marks': self.marks,
+            'username': self.user.username,
+            'book_status': self.book_status.status,
+            'added': self.get_listed_date()
+        }
+
     @staticmethod
     def get_by_id(pk):
         return BookToRent.query.get(pk)
