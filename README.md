@@ -1,3 +1,3 @@
-# Textrade Services
+# Textrade Services (RESTful API)
 
-Details will be added later.
+This is the RESTful API for Textrade.
