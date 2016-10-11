@@ -164,7 +164,7 @@ def create_book_to_rent(users, books):
             books[count], user_id=user['id'], condition=1,
             marks=False, condition_comment=""
         ).create()
-        print("{} created by {}".format(b, user))
+        print("{} created by {}".format(b, user['username']))
         b = BookRentController.create_renting_book(
             books[count + 1], user_id=user['id'], condition=1,
             marks=False, condition_comment=""
