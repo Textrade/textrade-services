@@ -1,5 +1,5 @@
 from flask import Blueprint, Response, request
-from flask_restful import Resource, Api, reqparse, fields
+from flask_restful import Resource, Api, reqparse, fields, marshal
 
 from app.auth.auth import client_auth
 from app.core.tools import dumper, JsonTemplate as JT
@@ -13,7 +13,7 @@ book_to_rent_fields = {
     'isbn': fields.String,
     'condition': fields.String,
     'book_status': fields.String,
-    'username': fields.String
+    'user': fields.String
 }
 
 
@@ -32,7 +32,24 @@ class SearchRes(Resource):
             return Response(dumper(json_resp),
                             mimetype=JT.JSON_RESP_TYPE, status=400)
         else:
-
+            if query.isdigit():
+                rv = SearchEngine.book_by_isbn(query)
+                data_list = [marshal(data, book_to_rent_fields) for data in rv]
+                json_resp['status'] = 200
+                json_resp['msg'] = "Search successful"
+                json_resp['totalItems'] = len(data_list)
+                json_resp['content'] = data_list
+                return Response(dumper(json_resp),
+                                mimetype=JT.JSON_RESP_TYPE, status=200)
+            elif not query.isnumeric():
+                rv = SearchEngine.book_by_title(query)
+                data_list = [marshal(data, book_to_rent_fields) for data in rv]
+                json_resp['status'] = 200
+                json_resp['msg'] = "Search successful"
+                json_resp['totalItems'] = len(data_list)
+                json_resp['content'] = data_list
+                return Response(dumper(json_resp),
+                                mimetype=JT.JSON_RESP_TYPE, status=200)
             return query
 
 

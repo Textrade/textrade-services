@@ -9,10 +9,11 @@ class SearchEngine:
 
     @staticmethod
     def book_by_isbn(isbn):
-        return BookToRent.query.filter(BookToRent.isbn.contains('%{}%'.format(isbn)))
+        return BookToRent.query.filter(BookToRent.isbn.like('{}%'.format(isbn)))
 
-    def book_by_title(self, title):
-        raise NotImplementedError
+    @staticmethod
+    def book_by_title(title):
+        return BookToRent.query.filter(BookToRent.name.contains('%{}%'.format(title)))
 
     def book_by_author(self, author):
         raise NotImplementedError
