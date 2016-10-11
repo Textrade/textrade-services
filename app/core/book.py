@@ -10,25 +10,24 @@ class BookRentController:
                and filename.rsplit('.', 1)[1] in allowed_extensions
 
     @staticmethod
-    def create_renting_book(isbn, user_id, **kwargs):
+    def create_renting_book(isbn, **kwargs):
         """
         This function throws a BookDoesNotExists if the Google Book
         API doesn't return any books.
         :param isbn:
-        :param user_id:
         :param kwargs:
         :return BookToRent:
         """
         book_info = BookAPI.load_book_info(isbn)
         book = BookToRent(
             name=book_info['title'],
-            author=book_info['author'],
+            author=book_info['authors'],
             description=book_info['description'],
             isbn=book_info['isbn'],
             condition=BookCondition.get_by_id(kwargs['condition']),
             comment=kwargs['condition_comment'],
             marks=kwargs['marks'],
-            user=User.get_by_id(user_id),
+            user=User.get_by_id(kwargs['user_id']),
             book_status=BookStatus.get_by_id(1),
         ).create()
         return book

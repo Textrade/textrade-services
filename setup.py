@@ -30,7 +30,22 @@ API_USERS = [
     ApiUser("developers", "dev", "Default user to use for development"),
 ]
 
-DEFAULT_BOOKS_TO_RENT_ISBN = [
+BOOK_CONDITIONS = [
+    BookCondition("Like New", "New"),
+    BookCondition("Very Good", "Minimal wear on cover, otherwise perfect"),
+    BookCondition("Good", "Some wear on the cover, spine and pages"),
+    BookCondition("Fair", "Noticeable wear on the cover, spine and pages"),
+    BookCondition("Bad", "Clear evidence of heavy use")
+]
+
+BOOK_STATUS = [
+    BookStatus("available"),
+    BookStatus("no_available"),
+    BookStatus("rented"),
+    BookStatus("requested")
+]
+
+BOOKS_TO_RENT_ISBN = [
     "9780981467344",
     "9780399144462",
     "9780812981605",
@@ -45,8 +60,12 @@ DEFAULT_BOOKS_TO_RENT_ISBN = [
     "9780321714114",
     "9780201314526",
     "9780133378719",
-    "9781926985015",
-    "9788449321948"
+    "9781585424337",
+    "9788449321948",
+    "9780470903247",
+    "9780321973610",
+    "9780538497817",
+    "9781250014450"
 ]
 
 
@@ -110,11 +129,59 @@ def create_api_users(api_users=None):
     print("API Users done")
 
 
+def create_book_status(status=None):
+    print("Creating Book Status")
+    for s in status:
+        try:
+            s.create()
+        except IntegrityError:
+            print("{} is duplicate... Continuing".format(s))
+        else:
+            print("{} created".format(s))
+    print("Book Status Done")
+
+
+def create_book_condition(book_conditions):
+    print("Creating Book Conditions")
+    for condition in book_conditions:
+        try:
+            condition.create()
+        except IntegrityError:
+            print("{} is duplicate... Continuing".format(condition))
+        else:
+            print("{} created".format(condition))
+    print("Book Conditions done")
+
+
+def create_book_to_rent(users, books):
+    print("Creating Book to Rent")
+    if len(books) < 20:
+        raise ValueError("Books array must be greater than 20")
+
+    count = 0
+    for user in users:
+        b = BookRentController.create_renting_book(
+            books[count], user_id=user['id'], condition=1,
+            marks=False, condition_comment=""
+        ).create()
+        print("{} created by {}".format(b, user))
+        b = BookRentController.create_renting_book(
+            books[count + 1], user_id=user['id'], condition=1,
+            marks=False, condition_comment=""
+        ).create()
+        print("{} created by {}".format(b, user['username']))
+        count += 2
+
+    print("Book to Rent done")
+
+
 def development():
     create_api_users(API_USERS)
     create_user_roles(USER_ROLES)
-    users = create_users()
-
+    USERS = create_users()
+    create_book_condition(BOOK_CONDITIONS)
+    create_book_status(BOOK_STATUS)
+    create_book_to_rent(USERS, BOOKS_TO_RENT_ISBN)
 
 
 def reset():
