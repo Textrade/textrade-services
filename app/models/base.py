@@ -19,8 +19,11 @@ class BaseModel:
         db.session.commit()
 
     def get_dict(self):
-        raise NotImplementedError
+        pass
 
     @staticmethod
     def build_from_args(**kwargs):
-        raise NotImplementedError
+        pass
+
+    class ModelError(Exception):
+        pass

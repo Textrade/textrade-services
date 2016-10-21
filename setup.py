@@ -13,7 +13,7 @@ from app.models.api import ApiUser
 from app.models.user import User, UserRole
 from app.core.book import BookRentController
 from app.models.book import (BookToRent, BookTradeHave, BookTradeWant,
-                             BookStatus, BookCondition, BookRenting,
+                             BookStatus, Condition, BookRenting,
                              BookRentingRequest)
 
 FILE_NAME = "users.txt"
@@ -31,11 +31,11 @@ API_USERS = [
 ]
 
 BOOK_CONDITIONS = [
-    BookCondition("Like New", "New"),
-    BookCondition("Very Good", "Minimal wear on cover, otherwise perfect"),
-    BookCondition("Good", "Some wear on the cover, spine and pages"),
-    BookCondition("Fair", "Noticeable wear on the cover, spine and pages"),
-    BookCondition("Bad", "Clear evidence of heavy use")
+    Condition("Like New", "New"),
+    Condition("Very Good", "Minimal wear on cover, otherwise perfect"),
+    Condition("Good", "Some wear on the cover, spine and pages"),
+    Condition("Fair", "Noticeable wear on the cover, spine and pages"),
+    Condition("Bad", "Clear evidence of heavy use")
 ]
 
 BOOK_STATUS = [

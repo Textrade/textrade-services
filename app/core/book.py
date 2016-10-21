@@ -1,5 +1,5 @@
 from app.core.google.google import BookAPI
-from app.models.book import BookToRent, BookRenting, BookCondition, BookStatus, BookRentingRequest
+from app.models.book import BookToRent, BookRenting, Condition, BookStatus, BookRentingRequest
 from app.models.user import User
 
 
@@ -24,7 +24,7 @@ class BookRentController:
             author=book_info['authors'],
             description=book_info['description'],
             isbn=book_info['isbn'],
-            condition=BookCondition.get_by_id(kwargs['condition']),
+            condition=Condition.get_by_id(kwargs['condition']),
             comment=kwargs['condition_comment'],
             marks=kwargs['marks'],
             user=User.get_by_id(kwargs['user_id']),

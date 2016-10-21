@@ -16,6 +16,12 @@ book_to_rent_fields = {
     'user': fields.String
 }
 
+"""
+No book => Show book -> [GoogleSearch] -> insert to Book -> "no available"
+No available => Show book -> "no available"
+Available ? book to rent => Show book -> "available"
+"""
+
 
 class SearchRes(Resource):
     def __init__(self):
