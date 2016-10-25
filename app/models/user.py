@@ -24,12 +24,12 @@ class User(BaseModel, db.Model):
                  username, password, university_email, role):
         """
         User Constructor
-        :param first_name:
-        :param last_name:
-        :param username:
-        :param password:
-        :param university_email:
-        :param role:
+        :param first_name: str
+        :param last_name: str
+        :param username: str
+        :param password: str
+        :param university_email: str
+        :param role: str
         :return:
         """
         self.first_name = first_name

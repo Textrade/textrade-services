@@ -23,11 +23,11 @@ class Book(BaseModel, db.Model):
                  img_url: str):
         """
         Book Constructor
-        :param title:
-        :param author:
-        :param description:
-        :param isbn:
-        :param img_url:
+        :param title: str
+        :param author: str
+        :param description: str
+        :param isbn: str
+        :param img_url: str
         :return:
         """
         self.isbn = isbn
