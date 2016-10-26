@@ -1,98 +1,84 @@
 from app.core.google.google import BookAPI
-from app.models.book import BookToRent, BookRenting, Condition, BookStatus, BookRentingRequest
-from app.models.user import User
+from app.models.book import Book
 
 
-class BookRentController:
-    @staticmethod
-    def allowed_file(filename, allowed_extensions):
-        return '.' in filename \
-               and filename.rsplit('.', 1)[1] in allowed_extensions
+class BookController:
+    """
+        Book Controller
+    """
+    def __init__(self, isbn):
+        self.isbn = isbn
 
-    @staticmethod
-    def create_renting_book(isbn, **kwargs):
+    def get_book(self) -> Book:
         """
-        This function throws a BookDoesNotExists if the Google Book
-        API doesn't return any books.
-        :param isbn:
-        :param kwargs:
-        :return BookToRent:
+            This method returns a Book or raise a
+            BookController.BookNotFound if after looking at the cached data
+            and Google Books API doesn't get any results.
+        :exception: BookController.BookNotFound
+        :return:    Book
         """
-        book_info = BookAPI.load_book_info(isbn)
-        book = BookToRent(
-            name=book_info['title'],
-            author=book_info['authors'],
-            description=book_info['description'],
-            isbn=book_info['isbn'],
-            condition=Condition.get_by_id(kwargs['condition']),
-            comment=kwargs['condition_comment'],
-            marks=kwargs['marks'],
-            user=User.get_by_id(kwargs['user_id']),
-            book_status=BookStatus.get_by_id(1),
-        ).create()
-        return book
+        book = None
+        try:
+            book = self.__get_book_from_db()
+        except self.BookNoCached:
+            book = self.__get_book_from_google()
+        finally:
+            return book
 
-    @staticmethod
-    def create_renting_request(book_id, user):
-        book = BookRentController.get_book_to_rent(book_id)
+    def __get_book_from_db(self) -> Book:
+        """
+            Query the data base Book table to returns a book. If it doesn't
+            find one, raise a BookController.BookNoCached.
+        :exception: BookController.BookNoCached
+        :return:    Book
+        """
+        book = Book.query.filter_by(isbn=self.isbn)
         if book:
-            return BookRentingRequest(
-                book,
-                book.user,
-                user
-            ).create()
-        return None
+            return book
+        else:
+            raise self.BookNoCached
 
-    @staticmethod
-    def delete_renting_request(pk):
-        BookRentingRequest.query.filter_by(id=pk).delete()
+    def __get_book_from_google(self) -> Book:
+        """
+            This method uses the BookAPI interface to the Google Book API
+            to find an book. If the book doesn't exits, it raises a
+            BookNotFound.
+        :exception: BookController.BookNotFound
+        :return:    Book
+        """
+        try:
+            return BookAPI.load_book_info(self.isbn)
+        except BookAPI.BookDoesNotExist:
+            raise self.BookNotFound
 
-    @staticmethod
-    def accept_renting_request(request_id):
-        renting_request = BookRentingRequest.query.filter_by(
-            id=request_id).first()
-        return BookRenting.create_from_request(renting_request)
-
-    @staticmethod
-    def get_currently_renting(user_id):
-        return BookRenting.query.filter_by(rentee_id=user_id)
-
-    @staticmethod
-    def get_currently_renting_out(user_id):
-        return BookRenting.query.filter_by(renter_id=user_id)
-
-    @staticmethod
-    def get_renting_request_by_id(request_id):
-        return BookRentingRequest.query.filter_by(id=request_id).first()
-
-    @staticmethod
-    def get_user_renting_incoming_requests(user_id):
-        return BookRentingRequest.query.filter_by(renter_id=user_id)
-
-    @staticmethod
-    def get_user_renting_outgoing_request(user_id):
-        return BookRentingRequest.query.filter_by(rentee_id=user_id)
-
-    @staticmethod
-    def get_book_to_rent(book_id):
-        return BookToRent.query.filter_by(id=book_id).first()
-
-    @staticmethod
-    def get_available_rentals(username):
-        return BookToRent.query.filter_by(
-            user_id=User.get_by_username(username).id
+    def build_from_args(self, **kwargs) -> Book:
+        """
+            Takes a dictionary an build a book. This is a helper function
+            created with the purpose of passing the return value of the
+            BookAPI interface load_book_info function. This function
+            instantiate a Book with this data.
+        :param kwargs:
+        :return: Book
+        """
+        return Book(
+            isbn=self.isbn,
+            title=kwargs['title'],
+            author=kwargs['authors'],
+            description=kwargs['description'],
+            img_url=kwargs['img_url'],
         )
 
     @staticmethod
-    def get_book_to_rent_user(book_id):
-        return BookRentController.get_book_to_rent(book_id).user
+    def create(isbn):
+        """
+            Creates an instance of the BookController.
+        :param isbn: str
+        :return: BookController
+        """
+        return BookController(isbn)
 
-    @staticmethod
-    def delete_book_to_rent(book_id):
-        BookToRent.query.get(book_id).delete()
-
-    class DuplicateEntry(Exception):
+    class BookNoCached(Exception):
         pass
 
-    class SelfBook(Exception):
+    class BookNotFound(Exception):
         pass

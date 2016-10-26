@@ -53,7 +53,7 @@ class Book(BaseModel, db.Model):
     def get_dict(self) -> dict:
         """
         Return a dict representation of Book
-        :return:
+        :return: dict
         """
         return {
             'id': self.id,
