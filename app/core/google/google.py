@@ -5,16 +5,17 @@ from app.models.book import Book
 
 class BookAPI:
     @staticmethod
-    def load_book_info(isbn) -> Book:
+    def load_book_info(val) -> Book:
         """
             This function uses the Google Book API to search for a given isbn
-            and create a Book model and return it.
-        :param isbn: str
+            or a title and create a Book model and return it.
+        :param val: str
         :return: Book
         """
+        val = val.replace(" ", "%20")  # Replace spaces with '%20'
         data = requests.get(
             "https://www.googleapis.com/books/v1/volumes?q={}".format(
-                isbn)
+                val)
         ).json()
 
         if data['totalItems']:
@@ -23,7 +24,7 @@ class BookAPI:
             except KeyError:
                 description = "No description available."
             book = {
-                'isbn': isbn,
+                'isbn': val,
                 'title': data['items'][0]['volumeInfo']['title'],
                 'author': ', '.join(data['items'][0]['volumeInfo']['authors']),
                 'description': description,
