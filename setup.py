@@ -190,7 +190,8 @@ def reset():
 
 
 def usage():
-    print("\nusage: python setup.py [-d development] [-p production] [-rd reset and build development]\n")
+    print("\nusage: python setup.py [-d development] [-p production] [-rd reset"
+          " and build development]\n")
 
 
 def run(args):
