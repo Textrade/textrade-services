@@ -6,8 +6,9 @@ class BookController:
     """
         Book Controller
     """
-    def __init__(self, isbn):
+    def __init__(self, isbn: str=None, title: str=None):
         self.isbn = isbn
+        self.title = title
 
     def get_book(self) -> Book:
         """
@@ -21,7 +22,7 @@ class BookController:
         try:
             book = self.__get_book_from_db()
         except self.BookNoCached:
-            book = self.__get_book_from_google()
+            book = self.__get_book_from_api()
         finally:
             return book
 
@@ -32,13 +33,20 @@ class BookController:
         :exception: BookController.BookNoCached
         :return:    Book
         """
-        book = Book.query.filter_by(isbn=self.isbn)
+        book = None
+        if self.isbn:
+            book = Book.query.filter_by(isbn=self.isbn)
+        elif self.title:
+            book = Book.query.filter_by(isbn=self.isbn)
+        else:
+            return None
+
         if book:
             return book
         else:
             raise self.BookNoCached
 
-    def __get_book_from_google(self) -> Book:
+    def __get_book_from_api(self) -> Book:
         """
             This method uses the BookAPI interface to the Google Book API
             to find an book. If the book doesn't exits, it raises a
@@ -69,13 +77,14 @@ class BookController:
         )
 
     @staticmethod
-    def create(isbn):
+    def create(isbn: str=None, title: str=None):
         """
             Creates an instance of the BookController.
+        :param title: str
         :param isbn: str
         :return: BookController
         """
-        return BookController(isbn)
+        return BookController(isbn, title)
 
     class BookNoCached(Exception):
         pass

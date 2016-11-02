@@ -5,6 +5,7 @@ from app.auth.auth import client_auth
 from app.core.tools import dumper, JsonTemplate as JT
 from app.core.search import SearchEngine
 
+# TODO: Check is this matches the new Book models attributes
 book_to_rent_fields = {
     'id': fields.Integer,
     'name': fields.String,
@@ -38,21 +39,9 @@ class SearchRes(Resource):
             return Response(dumper(json_resp),
                             mimetype=JT.JSON_RESP_TYPE, status=400)
         else:
-            # TODO: Make the search engine determinate what to search for,
-            # ISBN or Title.
-            # Instead, make a one call to the search engine for the search.
-            # e.i, SearchEngine.search_book(query) -> Book | Exception
-            if query.isdigit():
-                rv = SearchEngine.book_by_isbn(query)
-                data_list = [marshal(data, book_to_rent_fields) for data in rv]
-                json_resp['status'] = 200
-                json_resp['msg'] = "Search successful"
-                json_resp['totalItems'] = len(data_list)
-                json_resp['content'] = data_list
-                return Response(dumper(json_resp),
-                                mimetype=JT.JSON_RESP_TYPE, status=200)
-            elif not query.isnumeric():
-                rv = SearchEngine.book_by_title(query)
+            rv = SearchEngine(query).search()
+
+            if rv:
                 data_list = [marshal(data, book_to_rent_fields) for data in rv]
                 json_resp['status'] = 200
                 json_resp['msg'] = "Search successful"

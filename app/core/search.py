@@ -1,22 +1,86 @@
 from app import db
 from app.models.user import User
 from app.models.book import Book
+from app.core.book import BookController
 
 
 class SearchEngine:
-    def __init__(self):
-        pass
+    """
+        This is the search engine of the services. The goal of the engine is
+        to get data from the data base. If the data is not found, it find it
+        elsewhere, if the context is valid, and cached so that next time
+        there is no need to look somewhere else.
+    """
+    def __init__(self, query: str):
+        """
+            This is the constructor of the SearchEngine class. Here we try to
+            interpret the format of the query which decides where we are
+            searching.
+        :param query: str
+        :return:
+        """
+        self.isbn = None
+        self.title = None
 
-    @staticmethod
-    def book_by_isbn(isbn):
-        return Book.query.filter(Book.isbn.like('{}%'.format(isbn)))
+        if query.isdigit():
+            self.isbn = query
+        elif not query.isnumeric():
+            self.title = query
 
-    @staticmethod
-    def book_by_title(title):
-        return Book.query.filter(Book.name.contains('%{}%'.format(title)))
+    def search(self) -> ([db.Model], bool):
+        """
+            This function returns a tuple with the list of objects and a flag
+            where False is that the results are not exact and True is that
+            the result contains both, exact and result like the query.
+            This function might return None if the query is couldn't produce
+            any search.
+        :return: db.Model
+        """
+        results = []
 
-    def book_by_author(self, author):
+        if self.isbn:
+            results.append(self.__book_by_isbn())
+            results.append(self.__book_like_isbn())
+        elif self.title:
+            results.append(self.__book_by_title())
+            results.append(self.__book_like_title())
+        else:
+            return None
+
+        return results, (len(results) > 0)  # TODO: Test this results
+
+    def __book_by_isbn(self) -> Book:
+        """
+            This function calls the BookController to get a book by the isbn.
+        :return: Book
+        """
+        return BookController.create(self.isbn).get_book()
+
+    def __book_by_title(self) -> Book:
+        """
+            This function calls the BookController to get a Book by title.
+        :return: Book
+        """
+        return BookController.create(self.title).get_book()
+
+    def __book_like_isbn(self) -> [Book]:
+        """
+            This method returns a list of Book that are like the isbn in the
+            query.
+        :return: [Book]
+        """
+        return Book.query.filter(Book.isbn.like('{}%'.format(self.isbn)))
+
+    def __book_like_title(self) -> [Book]:
+        """
+            This method returns a list of Book that are like the title in the
+            query.
+        :return:
+        """
+        return Book.query.filter(Book.name.contains('%{}%'.format(self.title)))
+
+    def __book_by_author(self) -> Book:
         raise NotImplementedError
 
-    def user_by_username(self, username):
+    def user_by_username(self, username) -> User:
         raise NotImplementedError
