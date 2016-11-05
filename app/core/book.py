@@ -35,9 +35,9 @@ class BookController:
         """
         book = None
         if self.isbn:
-            book = Book.query.filter_by(isbn=self.isbn)
+            book = Book.query.filter_by(isbn=self.isbn).first()
         elif self.title:
-            book = Book.query.filter_by(isbn=self.isbn)
+            book = Book.query.filter_by(title=self.isbn).first()
         else:
             return None
 
@@ -55,7 +55,7 @@ class BookController:
         :return:    Book
         """
         try:
-            return BookAPI.load_book_info(self.isbn)
+            return BookAPI.load_book_info(self.isbn).create()
         except BookAPI.BookDoesNotExist:
             raise self.BookNotFound
 

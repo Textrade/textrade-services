@@ -2,19 +2,18 @@
 The purpose of this program is to setup the local environment,
 with default API User, User, UserRole, more will be added in the future.
 """
-import sys
 import os
+import sys
 
 from sqlalchemy.exc import IntegrityError
 
-from app import db
 import config
+from app import db
+from app.core.book import BookController
 from app.models.api import ApiUser
-from app.models.user import User, UserRole
-from app.core.book import BookRentController
-from app.models.book import (BookToRent, BookTradeHave, BookTradeWant,
-                             BookStatus, Condition, BookRenting,
-                             BookRentingRequest)
+from app.models.listing import Condition
+from app.models.transaction import TransactionStatus
+from app.models.user import UserRole
 
 FILE_NAME = "users.txt"
 USER_ROLES = [
@@ -25,7 +24,7 @@ USER_ROLES = [
 
 DEFAULT_USER_PASSWORD = "test"
 
-# Production: This user most be delete in production
+# TODO: Production: This user most be delete in production
 API_USERS = [
     ApiUser("developers", "dev", "Default user to use for development"),
 ]
@@ -38,14 +37,14 @@ BOOK_CONDITIONS = [
     Condition("Bad", "Clear evidence of heavy use")
 ]
 
-BOOK_STATUS = [
-    BookStatus("available"),
-    BookStatus("no_available"),
-    BookStatus("rented"),
-    BookStatus("requested")
+TRANSACTION_STATUS = [
+    TransactionStatus("available"),
+    TransactionStatus("no_available"),
+    TransactionStatus("rented"),
+    TransactionStatus("requested")
 ]
 
-BOOKS_TO_RENT_ISBN = [
+BOOKS = [
     "9780981467344",
     "9780399144462",
     "9780812981605",
@@ -73,7 +72,7 @@ def create_user_roles(roles=None):
     print("Creating User Roles")
     for role in roles:
         try:
-            pass
+            role.create()
         except IntegrityError:
             print("{} is duplicate... Continuing".format(role))
         else:
@@ -89,7 +88,8 @@ def create_users():
     users = []
     fp = open(FILE_NAME, "w")
     fp.write("Development User Information\n\n")
-    fp.write("Password for all users is: '{}'\n\n".format(DEFAULT_USER_PASSWORD))
+    fp.write("Password for all users is: '{}'\n\n".format(
+        DEFAULT_USER_PASSWORD))
     fp.write("Username\n=========\n")
 
     print("Creating Users")
@@ -129,8 +129,8 @@ def create_api_users(api_users=None):
     print("API Users done")
 
 
-def create_book_status(status=None):
-    print("Creating Book Status")
+def create_transaction_status(status=None):
+    print("Creating Transaction Status")
     for s in status:
         try:
             s.create()
@@ -138,7 +138,7 @@ def create_book_status(status=None):
             print("{} is duplicate... Continuing".format(s))
         else:
             print("{} created".format(s))
-    print("Book Status Done")
+    print("Transaction Status Done")
 
 
 def create_book_condition(book_conditions):
@@ -154,25 +154,19 @@ def create_book_condition(book_conditions):
 
 
 def create_book_to_rent(users, books):
-    print("Creating Book to Rent")
+    print("Creating Book...")
     if len(books) < 20:
         raise ValueError("Books array must be greater than 20")
 
     count = 0
     for user in users:
-        b = BookRentController.create_renting_book(
-            books[count], user_id=user['id'], condition=1,
-            marks=False, condition_comment=""
-        ).create()
-        print("{} created by {}".format(b, user['username']))
-        b = BookRentController.create_renting_book(
-            books[count + 1], user_id=user['id'], condition=1,
-            marks=False, condition_comment=""
-        ).create()
-        print("{} created by {}".format(b, user['username']))
+        b = BookController.create(books[count]).get_book()
+        print("{} created.".format(b))
+        b = BookController.create(books[count + 1]).get_book()
+        print("{} created.".format(b))
         count += 2
 
-    print("Book to Rent done")
+    print("Book done")
 
 
 def development():
@@ -180,13 +174,20 @@ def development():
     create_user_roles(USER_ROLES)
     USERS = create_users()
     create_book_condition(BOOK_CONDITIONS)
-    create_book_status(BOOK_STATUS)
-    create_book_to_rent(USERS, BOOKS_TO_RENT_ISBN)
+    create_transaction_status(TRANSACTION_STATUS)
+    create_book_to_rent(USERS, BOOKS)
 
 
 def reset():
-    os.remove('./%s' % config.DB_NAME)
-    os.remove('./%s' % FILE_NAME)
+    try:
+        os.remove('./%s' % config.DB_NAME)
+    except FileNotFoundError:
+        print("Database doesn't exist.")
+
+    try:
+        os.remove('./%s' % FILE_NAME)
+    except FileNotFoundError:
+        print("User file doesn't exist, creating one soon.")
 
 
 def usage():
@@ -195,9 +196,8 @@ def usage():
 
 
 def run(args):
-    db.create_all()  # Create database and tables if doesn't exits
-
     if len(args) == 2:
+        db.create_all()  # Create database and tables if doesn't exits
         if args[1] == '-d':
             development()
             print("Development setup created successfully")

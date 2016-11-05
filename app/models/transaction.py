@@ -47,12 +47,10 @@ class TransactionHistory(BaseModel, db.Model):
                                                ".listing_type"), nullable=False)
     user_a_username = db.Column(db.ForeignKey(User.__tablename__ +
                                               ".username"), nullable=False)
-    user_a = db.relationship(User.__name__, backref=db.backref(__tablename__,
-                                                               lazy=LAZY))
+    user_a = db.relationship(User.__name__, foreign_keys=[user_a_username])
     user_b_username = db.Column(db.ForeignKey(User.__tablename__ +
                                               ".username"), nullable=False)
-    user_b = db.relationship(User.__name__, backref=db.backref(__tablename__,
-                                                               lazy=LAZY))
+    user_b = db.relationship(User.__name__, foreign_keys=[user_b_username])
     book_isbn = db.Column(db.ForeignKey(Book.__tablename__ + ".isbn"),
                           nullable=False)
     book = db.relationship(Book.__name__, backref=db.backref(__tablename__,
