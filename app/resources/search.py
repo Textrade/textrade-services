@@ -8,13 +8,10 @@ from app.core.search import SearchEngine
 # TODO: Check is this matches the new Book models attributes
 book_to_rent_fields = {
     'id': fields.Integer,
-    'name': fields.String,
+    'title': fields.String,
     'author': fields.String,
     'description': fields.String,
-    'isbn': fields.String,
-    'condition': fields.String,
-    'book_status': fields.String,
-    'user': fields.String
+    'isbn': fields.String
 }
 
 """
@@ -40,16 +37,22 @@ class SearchRes(Resource):
                             mimetype=JT.JSON_RESP_TYPE, status=400)
         else:
             rv = SearchEngine(query).search()
-
-            if rv:
-                data_list = [marshal(data, book_to_rent_fields) for data in rv]
+            if rv[0]:
+                data_list = [marshal(data, book_to_rent_fields)
+                             for data in rv[0]]
                 json_resp['status'] = 200
                 json_resp['msg'] = "Search successful"
                 json_resp['totalItems'] = len(data_list)
                 json_resp['content'] = data_list
                 return Response(dumper(json_resp),
                                 mimetype=JT.JSON_RESP_TYPE, status=200)
-            return query
+            else:  # No book found
+                json_resp['content'] = None
+                json_resp['status'] = 404
+                json_resp['msg'] = "Book not found."
+                json_resp['totalItem'] = 0
+                return Response(dumper(json_resp),
+                                mimetype=JT.JSON_RESP_TYPE, status=200)
 
 
 search_api = Blueprint('app.res.search', __name__)

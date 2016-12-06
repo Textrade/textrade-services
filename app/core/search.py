@@ -1,3 +1,6 @@
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
 from app import db
 from app.models.user import User
 from app.models.book import Book
@@ -39,14 +42,25 @@ class SearchEngine:
         results = []
 
         if self.isbn:
-            results.append(self.__book_by_isbn())
-            results.append(self.__book_like_isbn())
+            rv = self.__book_by_isbn()
+            if rv:
+                results.append(rv)
+            results = list(set(results + self.__book_like_isbn()))
         elif self.title:
-            results.append(self.__book_by_title())
-            results.append(self.__book_like_title())
+            rv = self.__book_by_title()
+            if rv:
+                results.append(rv)
+            results = list(set(results + self.__book_like_title()))
         else:
             return None
 
+        for book in results:
+            if Book.query.filter_by(isbn=book.isbn).first():
+                pass
+            else:
+                Book(title=book.title, author=book.author,
+                     description=book.description, isbn=book.isbn,
+                     img_url=book.img_url).create()
         return results, (len(results) > 0)  # TODO: Test this results
 
     def __book_by_isbn(self) -> Book:
@@ -69,7 +83,8 @@ class SearchEngine:
             query.
         :return: [Book]
         """
-        return Book.query.filter(Book.isbn.like('{}%'.format(self.isbn)))
+        return [obj for obj in Book.query.filter(Book.isbn.like('{}%'.format(
+            self.isbn)))]
 
     def __book_like_title(self) -> [Book]:
         """
@@ -77,7 +92,8 @@ class SearchEngine:
             query.
         :return:
         """
-        return Book.query.filter(Book.name.contains('%{}%'.format(self.title)))
+        return [obj for obj in Book.query.filter(
+            Book.title.contains('%{}%'.format(self.title)))]
 
     def __book_by_author(self) -> Book:
         raise NotImplementedError

@@ -24,7 +24,8 @@ class BookAPI:
             except KeyError:
                 description = "No description available."
             book = {
-                'isbn': val,
+                'isbn': data['items'][0]['volumeInfo']
+                ['industryIdentifiers'][0]['identifier'],
                 'title': data['items'][0]['volumeInfo']['title'],
                 'author': ', '.join(data['items'][0]['volumeInfo']['authors']),
                 'description': description,
