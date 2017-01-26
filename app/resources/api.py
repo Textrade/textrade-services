@@ -2,7 +2,7 @@ from flask import Blueprint, g, Response, request
 from flask_restful import Resource, Api
 
 from app.auth.auth import client_auth
-from app.core.tools import JsonTemplate as JT, dumper
+from app.core.tools import ResponseTemplate as JT, dumper
 
 
 class ApiUserRes(Resource):

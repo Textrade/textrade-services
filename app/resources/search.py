@@ -2,7 +2,7 @@ from flask import Blueprint, Response, request
 from flask_restful import Resource, Api, reqparse, fields, marshal
 
 from app.auth.auth import client_auth
-from app.core.tools import dumper, JsonTemplate as JT
+from app.core.tools import ResponseTemplate
 from app.core.search import SearchEngine
 
 # TODO: Check is this matches the new Book models attributes
@@ -27,32 +27,22 @@ class SearchRes(Resource):
 
     @client_auth.login_required
     def get(self):
-        json_resp = JT.JSON_RESP_TEMPLATE
         try:
             query = request.args['q']
         except KeyError:
-            json_resp['status'] = 400
-            json_resp['msg'] = "Invalid or missing query string"
-            return Response(dumper(json_resp),
-                            mimetype=JT.JSON_RESP_TYPE, status=400)
+            msg = "Invalid or missing query string"
+            return ResponseTemplate(400, msg).get_response()
         else:
             rv = SearchEngine(query).search()
             if rv[0]:
                 data_list = [marshal(data, book_to_rent_fields)
                              for data in rv[0]]
-                json_resp['status'] = 200
-                json_resp['msg'] = "Search successful"
-                json_resp['totalItems'] = len(data_list)
-                json_resp['content'] = data_list
-                return Response(dumper(json_resp),
-                                mimetype=JT.JSON_RESP_TYPE, status=200)
-            else:  # No book found
-                json_resp['content'] = None
-                json_resp['status'] = 404
-                json_resp['msg'] = "Book not found."
-                json_resp['totalItem'] = 0
-                return Response(dumper(json_resp),
-                                mimetype=JT.JSON_RESP_TYPE, status=200)
+                msg = "Search successful"
+                response_template = ResponseTemplate(200, msg, data_list)
+                response_template.add_arg('totalItems', len(data_list))
+                return response_template.get_response()
+            else:
+                return ResponseTemplate.get_not_found("Any books found")
 
 
 search_api = Blueprint('app.res.search', __name__)

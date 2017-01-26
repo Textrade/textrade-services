@@ -1,22 +1,36 @@
 import json
 
+from flask import Response
 from flask_bcrypt import generate_password_hash, check_password_hash
 
-dumper = json.dumps
 
+class ResponseTemplate:
+    def __init__(self, status=None, msg=None, content=None,
+                 resp_type='application/json'):
+        self.dumper = json.dumps
+        self.status = status
+        self.data = {
+            'msg': msg,
+            'content': content
+        }
+        self.resp_type = resp_type
 
-class JsonTemplate:
-    JSON_RESP_TYPE = 'application/json'
-    JSON_RESP_TEMPLATE = {
-        'status': None,
-        'msg': None,
-        'content': None
-    }
-    JSON_NOT_FOUND_TEMPLATE = {
-        'status': 404,
-        'msg': None,
-        'content': None
-    }
+    def add_arg(self, key, value):
+        self.data[key] = value
+
+    def get_response(self):
+        return Response(
+            self.__dump_data(),
+            mimetype=self.resp_type,
+            status=self.status
+        )
+
+    def __dump_data(self):
+        return self.dumper(self.data)
+
+    @staticmethod
+    def get_not_found(msg):
+        return ResponseTemplate(404, msg).get_response()
 
 
 def check_hash(p_hash, password):

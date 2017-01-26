@@ -3,7 +3,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal
 
 from app.auth.auth import client_auth
 from app.core.user import UserController
-from app.core.tools import JsonTemplate as JT, dumper
+from app.core.tools import ResponseTemplate as JT, dumper
 
 
 class UserAuthRes(Resource):
