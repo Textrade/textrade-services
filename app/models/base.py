@@ -27,3 +27,6 @@ class BaseModel:
 
     class ModelError(Exception):
         pass
+
+    class NotFound(Exception):
+        pass

@@ -5,6 +5,9 @@ from app.models.user import User
 from app.models.book import Book
 from app.models.listing import ListingType
 
+from app.core.book import BookController
+from app.core.user import UserController
+
 
 class TransactionStatus(BaseModel, db.Model):
     """
@@ -63,14 +66,14 @@ class TransactionHistory(BaseModel, db.Model):
     rating_user_b = db.Column(db.Integer, default=None)
 
     def __init__(self, t_type: str, user_a: User, user_b: User, book: Book,
-                 price: float, t_date: datetime.datetime, status: str):
+                 price: float, status: str, t_date: datetime.datetime=None):
         self.transaction_type = t_type
-        self.user_a = user_a
-        self.user_a_username = user_a.username
-        self.user_b = user_b
-        self.user_b_username = user_b.username
-        self.book = book
-        self.book_isbn = book.isbn
+        self.user_a = UserController.get_user_by_username(user_a)
+        self.user_a_username = self.user_a.username
+        self.user_b = UserController.get_user_by_username(user_b)
+        self.user_b_username = self.user_b.username
+        self.book = BookController(isbn=book).get_book()
+        self.book_isbn = self.book.isbn
         self.price = price
         self.transaction_date = t_date
         self.transaction_status = status
@@ -78,3 +81,19 @@ class TransactionHistory(BaseModel, db.Model):
     def __repr__(self):
         return ("<TransactionHistory {}: Type {} User A {} User B {} Book {} "
                 "Price {} Date {} Status {}>")
+
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'type': self.transaction_type,
+            'user_a': self.user_a_username,
+            'user_b': self.user_b_username,
+            'book_name': self.book.title,
+            'book_isbn': self.book_isbn,
+            'price': self.price,
+            # TODO: Set this to self.transaction_date when no using SQLite
+            'date': "",
+            'status': self.transaction_status,
+            'rating_user_a': self.rating_user_a,
+            'rating_user_b': self.rating_user_b,
+        }
