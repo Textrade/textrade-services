@@ -18,19 +18,19 @@ class ResponseTemplate:
     def add_arg(self, key, value):
         self.data[key] = value
 
-    def get_response(self):
+    def response(self):
         return Response(
             self.__dump_data(),
             mimetype=self.resp_type,
             status=self.status
         )
 
-    def __dump_data(self):
-        return self.dumper(self.data)
+    def __dump_data(self, indent=4):
+        return self.dumper(self.data, indent=indent)
 
     @staticmethod
     def get_not_found(msg):
-        return ResponseTemplate(404, msg).get_response()
+        return ResponseTemplate(404, msg).response()
 
 
 def check_hash(p_hash, password):

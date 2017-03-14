@@ -3,7 +3,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal
 
 from app.auth.auth import client_auth
 from app.core.user import UserController
-from app.core.tools import ResponseTemplate as JT, dumper
+from app.core.tools import ResponseTemplate
 
 
 class UserAuthRes(Resource):
@@ -25,13 +25,9 @@ class UserAuthRes(Resource):
     @client_auth.login_required
     def post(self):
         args = self.parser.parse_args()
-        json_resp = JT.JSON_RESP_TEMPLATE
-        json_resp['status'] = 200
-        json_resp['content'] = UserController.verify_user(
+        is_verify = UserController.verify_user(
             args['username'], args['password'])
-        return Response(dumper(json_resp, indent=4),
-                        status=200, mimetype=JT.JSON_RESP_TYPE)
-
+        return ResponseTemplate(status=200, content=is_verify).response()
 
 user_fields = {
     'id': fields.Integer,
@@ -88,17 +84,12 @@ class UserRes(Resource):
         try:
             user = UserController.get_user_by_id(user_id)
         except UserController.UserNotFound:
-            json_resp = JT.JSON_NOT_FOUND_TEMPLATE
-            json_resp['msg'] = "User with ID=%s doesn't exists" % user_id
-            return Response(dumper(JT.JSON_NOT_FOUND_TEMPLATE),
-                            status=404, mimetype=JT.JSON_RESP_TYPE)
+            msg = "User with ID=%s doesn't exists" % user_id
+            return ResponseTemplate(status=404, msg=msg).response()
         else:
-            json_resp = JT.JSON_RESP_TEMPLATE
             user_info = marshal(user.get_dict(), user_fields)
-            json_resp['content'] = user_info
-            json_resp['status'] = 200
-            return Response(dumper(json_resp),
-                            status=200, mimetype=JT.JSON_RESP_TYPE)
+            return ResponseTemplate(
+                status=200, content=user_info).response()
 
     @client_auth.login_required
     def put(self):

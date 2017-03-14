@@ -1,5 +1,5 @@
-from flask import Blueprint, Response, request
-from flask_restful import Resource, Api, reqparse, fields, marshal
+from flask import Blueprint, request
+from flask_restful import Resource, Api, fields, marshal
 
 from app.auth.auth import client_auth
 from app.core.tools import ResponseTemplate
@@ -31,7 +31,7 @@ class SearchRes(Resource):
             query = request.args['q']
         except KeyError:
             msg = "Invalid or missing query string"
-            return ResponseTemplate(400, msg).get_response()
+            return ResponseTemplate(400, msg).response()
         else:
             rv = SearchEngine(query).search()
             if rv[0]:
@@ -40,7 +40,7 @@ class SearchRes(Resource):
                 msg = "Search successful"
                 response_template = ResponseTemplate(200, msg, data_list)
                 response_template.add_arg('totalItems', len(data_list))
-                return response_template.get_response()
+                return response_template.response()
             else:
                 return ResponseTemplate.get_not_found("Any books found")
 
